@@ -31,7 +31,7 @@ export class StampPage {
         .click()
       await this.page
         .locator('li')
-        .filter({ hasText: '天士力电子签' })
+        .filter({ hasText: '电子签' })
         .first()
         .click()
       await this.page
@@ -62,7 +62,7 @@ export class StampPage {
         .click()
       await this.page
         .locator('li')
-        .filter({ hasText: '天士力电子签' })
+        .filter({ hasText: '电子签' })
         .first()
         .click()
       await this.page
