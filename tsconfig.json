@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": false,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "experimentalDecorators": true,
+    "strictFunctionTypes": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "noImplicitAny": true,
+    "allowJs": false,
+    "resolveJsonModule": true,
+    "lib": ["dom", "esnext"],
+    "types": ["node"],
+    "typeRoots": ["./types", "./node_modules/@types/"]
+  },
+  "include": ["e2e/**/*.ts"],
+  "exclude": ["node_modules", "playwright-report", "test-results"]
+}

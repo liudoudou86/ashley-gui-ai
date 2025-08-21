@@ -1,0 +1,69 @@
+image: 
+
+variables:
+  NODE_MODULES: node_modules
+  # 钉钉配置
+  DINGTOKEN: 
+  DINGSECRET: 
+  AUTOMATION_TITLE: E2E-Automation Regression
+  AUTOMATION_PROJECT: 
+  AUTOMATION_ENVIRONMENT: STG
+  REPORT_HOST: 
+  REPORT_PORT: 
+  REPORT_ENDPOINT: /e2e?id=$CI_PIPELINE_ID
+  PLAYWRIGHT_REPORT: $CI_PROJECT_DIR/playwright-report
+  PROJECT_NAME: disuse
+
+stages:
+  - e2e
+
+e2e-gui:
+  when: always
+  stage: e2e
+  variables:
+    TARPATH: /automation
+    TARFILE: e2e-automation-report-$CI_PIPELINE_ID.tar.gz
+  script:
+    - echo "starting e2e-gui build"
+    - rm -rf node_modules .pnpm-store
+    - pnpm install --frozen-lockfile
+    - echo "starting e2e-gui test"
+    - pnpm test --project=${PROJECT_NAME} || true
+    - echo "starting report upload"
+    - ls -l ${PLAYWRIGHT_REPORT} | grep index.html
+    - mkdir -p ${TARPATH} && chmod -R 777 ${TARPATH} && ls -l ${TARPATH}
+    - tar -czvf ${TARPATH}/${TARFILE} ${PLAYWRIGHT_REPORT}
+    - ls -l ${TARPATH}
+    - curl -v -X POST http://${REPORT_HOST}:${REPORT_PORT}/upload -F "filename=@${TARPATH}/${TARFILE}"
+    - |
+      curl -v -X POST http://${REPORT_HOST}:${REPORT_PORT}/ding \
+        -H "Content-Type: application/json" \
+        -d '{
+        "dingding_secret": "'"${DINGSECRET}"'",
+        "dingding_token": "'"${DINGTOKEN}"'",
+        "automation_title": "'"${AUTOMATION_TITLE}"'",
+        "automation_project": "'"${AUTOMATION_PROJECT}"'",
+        "test_project": "'"${CI_PROJECT_NAME}"'",
+        "pipeline_id": "'"${CI_PIPELINE_ID}"'",
+        "report_host": "'"${REPORT_HOST}"'",
+        "report_port": "'"${REPORT_PORT}"'",
+        "report_endpoint": "'"${REPORT_ENDPOINT}"'",
+        "automation_environment": "'"${AUTOMATION_ENVIRONMENT}"'",
+        "commit_ref": "'"${CI_COMMIT_REF_NAME}"'",
+        "commit_sha": "'"${CI_COMMIT_SHA}"'",
+        "commit_title": "'"${CI_COMMIT_TITLE}"'",
+        "commit_user": "'"${GITLAB_USER_EMAIL}"'",
+        "commit_time": "'"${CI_COMMIT_TIMESTAMP}"'"
+      }'
+  only:
+    - master
+  except:
+    - develop
+  artifacts:
+    name: e2e-report
+    paths:
+      - playwright-report
+    expire_in: 8 hrs 30 min
+    when: always
+    untracked: false
+  coverage: '/Total.*?([0-9]{1,3})%/'

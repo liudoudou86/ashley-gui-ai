@@ -1,0 +1,10 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended" // 添加这行
+  ],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "error" // 将 prettier 的错误作为 eslint 错误显示
+  }
+}
